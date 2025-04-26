@@ -12,9 +12,8 @@ MONGO_URI = os.getenv("MONGO_URI")
 if not MONGO_URI:
     raise ValueError("MONGO_URI environment variable not set")
 client = MongoClient(MONGO_URI)
-db = client["app-directory"]
-apps_collection = db["apps"]
-profiles_collection = db["profiles"]
+db = client["mxp"]
+redirects_collection = db["redirects"]
 
 BASE_URL = "https://mixpeek.com/apps/"
 
@@ -22,18 +21,9 @@ BASE_URL = "https://mixpeek.com/apps/"
 @app.get("/{path}")
 def redirect_to_mp_apps(path: str):
     # Check if the path exists in the apps collection
-    if apps_collection.find_one({"slug": path}):
-        target_url = f"{BASE_URL}{path}"
+    redirect = redirects_collection.find_one({"slug": path})
+    if redirect:
+        target_url = redirect["target"]
         return RedirectResponse(url=target_url)
     else:
-        return RedirectResponse(url="https://mixpeek.com")
-
-
-@app.get("/p/{path}")
-def redirect_to_mp_profiles(path: str):
-    # Check if the path exists in the profiles collection
-    if profiles_collection.find_one({"path": path}):
-        target_url = f"{BASE_URL}profiles/{path}"
-        return RedirectResponse(url=target_url)
-    else:
-        return RedirectResponse(url="https://mixpeek.com")
+        return RedirectResponse(url="https://mixpeek.com/404")
