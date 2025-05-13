@@ -27,3 +27,8 @@ def redirect_to_mp_apps(path: str):
         return RedirectResponse(url=target_url)
     else:
         return RedirectResponse(url="https://mixpeek.com/404")
+
+
+@app.get("/")
+def redirect_to_mp_apps():
+    return RedirectResponse(url="https://mixpeek.com/apps")
